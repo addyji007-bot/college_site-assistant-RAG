@@ -44,8 +44,16 @@ from crawl4ai import (
 BASE_URL = "https://www.vit.edu/"
 SITEMAP_URL = "https://www.vit.edu/sitemap.xml"
 
-# Keep this small while testing.
-MAX_PAGES = 12
+# Production run: crawl all keyword-relevant pages, plus a small buffer of
+# other sitemap pages in case anything useful wasn't caught by keywords.
+MAX_RELEVANT_PAGES = 60   # your test found 48 relevant URLs -- this covers them
+MAX_OTHER_PAGES = 10      # small fallback budget for non-keyword-matched pages
+MAX_PAGES = MAX_RELEVANT_PAGES + MAX_OTHER_PAGES  # kept for BFS, which has no relevant/other split
+
+# BFS explores the link graph rather than targeting keywords, so it tends to
+# wander into policy/compliance pages (AQAR, NIRF, etc). Useful as a
+# complementary pass, but don't let it dominate the crawl budget.
+BFS_MAX_PAGES = 30
 
 RELEVANT_KEYWORDS = [
     "admission",
@@ -189,7 +197,7 @@ def fetch_sitemap_urls():
             f"{len(all_urls) - len(html_urls)} PDF URLs"
         )
 
-    return relevant + others
+    return relevant, others
 
 
 # ---------------------------------------------------------------------------
@@ -198,7 +206,13 @@ def fetch_sitemap_urls():
 
 async def crawl_via_sitemap():
 
-    urls = fetch_sitemap_urls()[:MAX_PAGES]
+    relevant_urls, other_urls = fetch_sitemap_urls()
+    urls = relevant_urls[:MAX_RELEVANT_PAGES] + other_urls[:MAX_OTHER_PAGES]
+    print(
+        f"[sitemap] Using {len(relevant_urls[:MAX_RELEVANT_PAGES])} relevant "
+        f"+ {len(other_urls[:MAX_OTHER_PAGES])} fallback pages "
+        f"= {len(urls)} total"
+    )
 
     if not urls:
         print(
@@ -331,7 +345,7 @@ async def crawl_via_bfs():
 
     deep_crawl_strategy = BFSDeepCrawlStrategy(
         max_depth=2,
-        max_pages=MAX_PAGES,
+        max_pages=BFS_MAX_PAGES,
         filter_chain=filter_chain,
         include_external=False,
     )
@@ -351,7 +365,7 @@ async def crawl_via_bfs():
 
     print(
         f"[bfs] Starting BFS crawl "
-        f"(max {MAX_PAGES} pages)..."
+        f"(max {BFS_MAX_PAGES} pages)..."
     )
 
     async with AsyncWebCrawler(
