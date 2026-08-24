@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+env/
+venv/
+.venv/
+
+# Scraped / generated data (large, regenerable -- don't bloat the repo)
+scraped_pages/
+pdfs/
+pdfs_text/
+vit_website.md
+
+# Playwright
+.playwright/
+
+# Environment / secrets
+.env
+*.env.local
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
