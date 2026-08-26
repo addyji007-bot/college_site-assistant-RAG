@@ -318,6 +318,18 @@ async def crawl_via_sitemap():
 
             print()
 
+    # Save URL metadata alongside the markdown -- needed so a later
+    # chunking/RAG step can cite the source page instead of just
+    # "page_03.md" with no idea what it came from.
+    import json
+    metadata = [
+        {"file": f"page_{i:02d}.md", "source_url": url, "chars": chars}
+        for i, (url, chars) in enumerate(results_summary)
+    ]
+    (SITEMAP_DIR / "metadata.json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
+
     return results_summary
 
 
@@ -447,6 +459,7 @@ async def crawl_via_bfs():
                 (
                     result.url,
                     len(md),
+                    fname.name,
                 )
             )
 
@@ -456,6 +469,15 @@ async def crawl_via_bfs():
                 f"({len(md)} chars) "
                 f"<- {result.url}"
             )
+
+    import json
+    metadata = [
+        {"file": fname, "source_url": url, "chars": chars}
+        for url, chars, fname in results_summary
+    ]
+    (BFS_DIR / "metadata.json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
 
     return results_summary
 
@@ -516,7 +538,7 @@ async def main():
         avg = (
             sum(
                 length
-                for _, length in bfs_results
+                for _, length, _ in bfs_results
             )
             / len(bfs_results)
         )

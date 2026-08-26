@@ -1,30 +1,121 @@
+# =========================
 # Python
+# =========================
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
 .Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Virtual environments
 env/
 venv/
 .venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Scraped / generated data (large, regenerable -- don't bloat the repo)
+# =========================
+# Scraped / generated data
+# =========================
+# Large, regenerable -- don't bloat the repo
 scraped_pages/
 pdfs/
 pdfs_text/
 vit_website.md
 
+# =========================
 # Playwright
+# =========================
 .playwright/
+playwright-report/
+blob-report/
+playwright/.cache/
 
+# =========================
 # Environment / secrets
+# =========================
 .env
+.env.*
 *.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
 
+# =========================
 # OS junk
+# =========================
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+Desktop.ini
 
-# Editor
+# =========================
+# Editor / IDE
+# =========================
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+.project
+.classpath
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.bak
+.cache/
+tmp/
+temp/
+
+# =========================
+# Jupyter Notebook
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Node.js (if used by tooling)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Local databases
+# =========================
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================
+# macOS / Windows
+# =========================
+.AppleDouble
+.LSOverride
+$RECYCLE.BIN/
