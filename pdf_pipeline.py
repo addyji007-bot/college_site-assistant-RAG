@@ -228,11 +228,19 @@ def extract_pdf_text_only(pdf_path: Path) -> str:
 
                 tables = page.extract_tables()
                 for t_idx, table in enumerate(tables):
-                    rows = [
-                        " | ".join(cell or "" for cell in row)
-                        for row in table
-                        if row
-                    ]
+                    rows = []
+                    for row in table:
+                        if not row:
+                            continue
+                        cells = [str(cell).strip() if cell else "" for cell in row]
+                        # BUG FIX: previously `if row` only checked the row list
+                        # itself was non-empty, not that any cell had content --
+                        # so tables where pdfplumber detected a grid but every
+                        # cell was blank (a PDF formatting artifact, not real
+                        # data) still got written out as "| |..." noise. Now
+                        # skip rows where every cell is blank.
+                        if any(cells):
+                            rows.append(" | ".join(cells))
                     if rows:
                         parts.append(
                             f"--- Page {i + 1} Table {t_idx + 1} ---\n" + "\n".join(rows)
